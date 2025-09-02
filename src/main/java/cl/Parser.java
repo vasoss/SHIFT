@@ -31,10 +31,19 @@ public class Parser {
                     break;
                 case "-p":
                     if(i+1 < commandLine.length) {
-                        options.setFilePrefix(commandLine[i+1]);
+                        String prefix = commandLine[i+1];
+                        String[] badChars = new String[]{"\\", "/", ":", "*", "?", "\"", "<", ">", "|"};
+                        options.setFilePrefix(prefix);
+                        for(String badChar : badChars){
+                            if(prefix.contains(badChar)){
+                                System.err.println("Префикс содержит недопустимые символы, файлы будут названы по умолчанию с префиксом 'default-'");
+                                options.setFilePrefix("default-");
+                                break;
+                            }
+                        }
                         i++;
                     }else{
-                        System.err.println("После опции '-p' не указан префикс, файлы будут названы по умолчанию");
+                        System.err.println("После -p укажите префикс");
                     }
                     break;
                 case "-a":
