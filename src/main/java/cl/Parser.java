@@ -1,6 +1,11 @@
 package cl;
 import config.Settings;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class Parser {
 
     public void parse(String[] commandLine, Settings options){
@@ -11,14 +16,17 @@ public class Parser {
             switch (arg){
                 case "-o":
                     if(i+1 < commandLine.length){
-                        if(commandLine[i+1].endsWith("/")){
-                            options.setOutputPath(commandLine[i+1]);
-                        }else{
-                            options.setOutputPath(commandLine[i+1] + "/");
+                        String path = commandLine[i + 1];
+                        Path outputDir = Paths.get(path).toAbsolutePath();
+                        if (!Files.exists(outputDir)) {
+                            System.err.println("Директория '"+ outputDir +"' не существует");
+                            System.err.println("Файлы будут записаны в текущую папку");
+                        } else {
+                            options.setOutputPath(outputDir + File.separator);
                         }
-                    i++;
+                        i++;
                     }else{
-                        System.err.println("После -o укажите путь");
+                        System.err.println("После опции '-o' не указан путь, файлы будут записаны в текущую папку");
                     }
                     break;
                 case "-p":
@@ -26,7 +34,7 @@ public class Parser {
                         options.setFilePrefix(commandLine[i+1]);
                         i++;
                     }else{
-                        System.err.println("После -p укажите префикс");
+                        System.err.println("После опции '-p' не указан префикс, файлы будут названы по умолчанию");
                     }
                     break;
                 case "-a":
